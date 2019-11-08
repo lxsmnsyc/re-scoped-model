@@ -54,18 +54,21 @@ module CounterModel: ScopedModel.Model {
 module Counter = ScopedModel.Make(CounterModel);
 
 module Count {
+  [@react.component]
   let make = () => {
     let count: CounterModel.State.t = Counter.useState(true);
 
-    <h1>
-      {ReasonReact.string(string_of_int(count))}
-    </h1>
+    Js.log(count);
+
+    <hr />
   }
 }
 
 // All 4 examples.
 
 ReactDOMRe.render(
-  <hr />,
+  <Counter.Provider>
+    <Count />
+  </Counter.Provider>,
   document##body,
 );
