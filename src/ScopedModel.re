@@ -94,7 +94,7 @@ module Make = (M: Model) => {
     }
   }
 
-  let useState = (listen: bool) => {
+  let useState = (listen: bool): M.State.t => {
     let ctx: Emitter.t(M.Hook.Return.t) = React.useContext(context);
 
     let forceUpdate = Utils.useForceUpdate();
@@ -106,6 +106,36 @@ module Make = (M: Model) => {
     let callback = React.useCallback1((next: M.Hook.Return.t) => {
       if (next.state == React.Ref.current(ref)) {
         React.Ref.setCurrent(ref, next.state);
+
+        forceUpdate();
+      }
+    }, [||]);
+
+    React.useEffect3(() => {
+      if (listen) {
+        ctx.on(callback);
+
+        Some(() => ctx.off(callback));
+      } else {
+        None;
+      }
+    }, (ctx, listen, callback));
+
+    React.Ref.current(ref);
+  };
+
+  let useAction = (listen: bool): M.Action.t => {
+    let ctx: Emitter.t(M.Hook.Return.t) = React.useContext(context);
+
+    let forceUpdate = Utils.useForceUpdate();
+
+    let ref = React.useRef(ctx.state^.action);
+
+    React.Ref.setCurrent(ref, ctx.state^.action);
+
+    let callback = React.useCallback1((next: M.Hook.Return.t) => {
+      if (next.action == React.Ref.current(ref)) {
+        React.Ref.setCurrent(ref, next.action);
 
         forceUpdate();
       }
