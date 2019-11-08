@@ -72,16 +72,19 @@ var CounterModel = {
 
 var Counter = ScopedModel$ReasonReactExamples.Make(CounterModel);
 
-function make(param) {
-  Curry._1(Counter.useState, true);
-  return /* () */0;
+function Index$Count(Props) {
+  var count = Curry._1(Counter.useState, true);
+  console.log(count);
+  return React.createElement("hr", undefined);
 }
 
 var Count = {
-  make: make
+  make: Index$Count
 };
 
-ReactDom.render(React.createElement("hr", undefined), document.body);
+ReactDom.render(React.createElement(Counter.Provider.make, {
+          children: React.createElement(Index$Count, { })
+        }), document.body);
 
 exports.CounterModel = CounterModel;
 exports.Counter = Counter;
