@@ -2,7 +2,7 @@
 
 [@bs.val] external document: Js.t({..}) = "document";
 
-module Counter = ScopedModel.Make({
+module CounterModel: ScopedModel.Model {
   module State {
     type t = int;
 
@@ -49,8 +49,19 @@ module Counter = ScopedModel.Make({
       };
     };
   };
-});
+};
 
+module Counter = ScopedModel.Make(CounterModel);
+
+module Count {
+  let make = () => {
+    let count: CounterModel.State.t = Counter.useState(true);
+
+    <h1>
+      {ReasonReact.string(string_of_int(count))}
+    </h1>
+  }
+}
 
 // All 4 examples.
 
