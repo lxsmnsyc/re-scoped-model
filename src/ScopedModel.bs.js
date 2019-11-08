@@ -78,13 +78,42 @@ function Make(M) {
         ]);
     return ref.current;
   };
+  var useAction = function (listen) {
+    var ctx = React.useContext(context);
+    var forceUpdate = Utils$ReasonReactExamples.useForceUpdate(/* () */0);
+    var ref = React.useRef(ctx[/* state */0][0][/* action */1]);
+    ref.current = ctx[/* state */0][0][/* action */1];
+    var callback = React.useCallback((function (next) {
+            if (Caml_obj.caml_equal(next[/* action */1], ref.current)) {
+              ref.current = next[/* action */1];
+              return Curry._1(forceUpdate, /* () */0);
+            } else {
+              return 0;
+            }
+          }), /* array */[]);
+    React.useEffect((function (param) {
+            if (listen) {
+              Curry._1(ctx[/* on */1], callback);
+              return (function (param) {
+                        return Curry._1(ctx[/* off */2], callback);
+                      });
+            }
+            
+          }), /* tuple */[
+          ctx,
+          listen,
+          callback
+        ]);
+    return ref.current;
+  };
   return {
           context: context,
           ContextProvider: ContextProvider,
           EmitterProvider: EmitterProvider,
           EmitterConsumer: EmitterConsumer,
           Provider: Provider,
-          useState: useState
+          useState: useState,
+          useAction: useAction
         };
 }
 
