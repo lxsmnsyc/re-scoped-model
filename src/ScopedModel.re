@@ -43,7 +43,6 @@ module type Model = {
   };
 };
 
-
 module Make = (M: Model) => {
   /**
    *  Create Context
@@ -101,12 +100,9 @@ module Make = (M: Model) => {
 
     let ref = React.useRef(ctx.state^.state);
 
-    React.Ref.setCurrent(ref, ctx.state^.state);
-
     let callback = React.useCallback1((next: M.Hook.Return.t) => {
-      if (next.state == React.Ref.current(ref)) {
+      if (next.state != React.Ref.current(ref)) {
         React.Ref.setCurrent(ref, next.state);
-
         forceUpdate();
       }
     }, [||]);
@@ -131,10 +127,8 @@ module Make = (M: Model) => {
 
     let ref = React.useRef(ctx.state^.action);
 
-    React.Ref.setCurrent(ref, ctx.state^.action);
-
     let callback = React.useCallback1((next: M.Hook.Return.t) => {
-      if (next.action == React.Ref.current(ref)) {
+      if (next.action != React.Ref.current(ref)) {
         React.Ref.setCurrent(ref, next.action);
 
         forceUpdate();
@@ -153,4 +147,5 @@ module Make = (M: Model) => {
 
     React.Ref.current(ref);
   };
-}
+};
+
