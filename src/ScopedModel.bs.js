@@ -54,9 +54,8 @@ function Make(M) {
     var ctx = React.useContext(context);
     var forceUpdate = Utils$ReasonReactExamples.useForceUpdate(/* () */0);
     var ref = React.useRef(ctx[/* state */0][0][/* state */0]);
-    ref.current = ctx[/* state */0][0][/* state */0];
     var callback = React.useCallback((function (next) {
-            if (Caml_obj.caml_equal(next[/* state */0], ref.current)) {
+            if (Caml_obj.caml_notequal(next[/* state */0], ref.current)) {
               ref.current = next[/* state */0];
               return Curry._1(forceUpdate, /* () */0);
             } else {
@@ -82,9 +81,8 @@ function Make(M) {
     var ctx = React.useContext(context);
     var forceUpdate = Utils$ReasonReactExamples.useForceUpdate(/* () */0);
     var ref = React.useRef(ctx[/* state */0][0][/* action */1]);
-    ref.current = ctx[/* state */0][0][/* action */1];
     var callback = React.useCallback((function (next) {
-            if (Caml_obj.caml_equal(next[/* action */1], ref.current)) {
+            if (Caml_obj.caml_notequal(next[/* action */1], ref.current)) {
               ref.current = next[/* action */1];
               return Curry._1(forceUpdate, /* () */0);
             } else {
