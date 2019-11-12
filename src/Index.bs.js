@@ -74,19 +74,51 @@ var Counter = ScopedModel$ReasonReactExamples.Make(CounterModel);
 
 function Index$Count(Props) {
   var count = Curry._1(Counter.useState, true);
-  console.log(count);
-  return React.createElement("hr", undefined);
+  console.log("Count");
+  return React.createElement("p", undefined, String(count));
 }
 
 var Count = {
   make: Index$Count
 };
 
+function Index$Increment(Props) {
+  var match = Curry._1(Counter.useAction, true);
+  var increment = match[/* increment */0];
+  console.log("Increment");
+  return React.createElement("button", {
+              onClick: (function (param) {
+                  return Curry._1(increment, /* () */0);
+                })
+            }, "Increment");
+}
+
+var Increment = {
+  make: Index$Increment
+};
+
+function Index$Decrement(Props) {
+  var match = Curry._1(Counter.useAction, true);
+  var decrement = match[/* decrement */1];
+  console.log("Decrement");
+  return React.createElement("button", {
+              onClick: (function (param) {
+                  return Curry._1(decrement, /* () */0);
+                })
+            }, "Decrement");
+}
+
+var Decrement = {
+  make: Index$Decrement
+};
+
 ReactDom.render(React.createElement(Counter.Provider.make, {
-          children: React.createElement(Index$Count, { })
-        }), document.body);
+          children: null
+        }, React.createElement(Index$Count, { }), React.createElement(Index$Increment, { }), React.createElement(Index$Decrement, { })), document.body);
 
 exports.CounterModel = CounterModel;
 exports.Counter = Counter;
 exports.Count = Count;
+exports.Increment = Increment;
+exports.Decrement = Decrement;
 /* Counter Not a pure module */
