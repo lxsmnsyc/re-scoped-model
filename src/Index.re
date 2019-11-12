@@ -2,7 +2,7 @@
 
 [@bs.val] external document: Js.t({..}) = "document";
 
-module CounterModel: ScopedModel.Model {
+module CounterModel {
   module State {
     type t = int;
 
@@ -56,11 +56,32 @@ module Counter = ScopedModel.Make(CounterModel);
 module Count {
   [@react.component]
   let make = () => {
-    let count: CounterModel.State.t = Counter.useState(true);
+    let count = Counter.useState(true);
 
-    Js.log(count);
+    Js.log("Count");
+    <p>{ ReasonReact.string(string_of_int(count)) }</p>
+  }
+}
+module Increment {
+  [@react.component]
+  let make = () => {
+    let { increment }: CounterModel.Action.t = Counter.useAction(true);
 
-    <hr />
+    Js.log("Increment");
+    <button onClick={_ => increment()}>
+      { ReasonReact.string("Increment") }
+    </button>
+  }
+}
+module Decrement {
+  [@react.component]
+  let make = () => {
+    let { decrement }: CounterModel.Action.t = Counter.useAction(true);
+
+    Js.log("Decrement");
+    <button onClick={_ => decrement()}>
+      { ReasonReact.string("Decrement") }
+    </button>
   }
 }
 
@@ -69,6 +90,8 @@ module Count {
 ReactDOMRe.render(
   <Counter.Provider>
     <Count />
+    <Increment />
+    <Decrement />
   </Counter.Provider>,
   document##body,
 );
