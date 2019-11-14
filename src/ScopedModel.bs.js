@@ -1,13 +1,16 @@
 'use strict';
 
+var $$Array = require("bs-platform/lib/js/array.js");
 var Curry = require("bs-platform/lib/js/curry.js");
 var React = require("react");
+var Js_dict = require("bs-platform/lib/js/js_dict.js");
 var Caml_obj = require("bs-platform/lib/js/caml_obj.js");
-var Utils$ReasonReactExamples = require("./Utils.bs.js");
-var Emitter$ReasonReactExamples = require("./Emitter.bs.js");
+var Caml_array = require("bs-platform/lib/js/caml_array.js");
+var Utils$ReScopedModel = require("./Utils.bs.js");
+var Emitter$ReScopedModel = require("./Emitter.bs.js");
 
 function Make(M) {
-  var context = React.createContext(Emitter$ReasonReactExamples.make(M.Hook.Return.initial));
+  var context = React.createContext(Emitter$ReScopedModel.make({ }));
   var make = context.Provider;
   var makeProps = function (value, children, param) {
     return {
@@ -22,7 +25,7 @@ function Make(M) {
   var ScopedModel$Make$EmitterProvider = function (Props) {
     var children = Props.children;
     var emitter = React.useMemo((function () {
-            return Emitter$ReasonReactExamples.make(M.Hook.Return.initial);
+            return Emitter$ReScopedModel.make({ });
           }), /* array */[]);
     return React.createElement(make, makeProps(emitter, children, /* () */0));
   };
@@ -32,7 +35,7 @@ function Make(M) {
   var ScopedModel$Make$EmitterConsumer = function (Props) {
     var children = Props.children;
     var ctx = React.useContext(context);
-    var model = Curry._1(M.Hook.call, /* () */0);
+    var model = Curry._1(M.call, /* () */0);
     Curry._1(ctx[/* consume */3], model);
     return children;
   };
@@ -50,18 +53,19 @@ function Make(M) {
   var Provider = {
     make: ScopedModel$Make$Provider
   };
-  var useState = function (listen) {
+  var useProperty = function (key, listen) {
     var ctx = React.useContext(context);
-    var forceUpdate = Utils$ReasonReactExamples.useForceUpdate(/* () */0);
-    var ref = React.useRef(ctx[/* state */0][0][/* state */0]);
+    var forceUpdate = Utils$ReScopedModel.useForceUpdate(/* () */0);
+    var ref = React.useRef(Js_dict.get(ctx[/* state */0][0], key));
     var callback = React.useCallback((function (next) {
-            if (Caml_obj.caml_notequal(next[/* state */0], ref.current)) {
-              ref.current = next[/* state */0];
+            var value = Js_dict.get(next, key);
+            if (Caml_obj.caml_notequal(value, ref.current)) {
+              ref.current = value;
               return Curry._1(forceUpdate, /* () */0);
             } else {
               return 0;
             }
-          }), /* array */[]);
+          }), /* array */[key]);
     React.useEffect((function (param) {
             if (listen) {
               Curry._1(ctx[/* on */1], callback);
@@ -77,18 +81,37 @@ function Make(M) {
         ]);
     return ref.current;
   };
-  var useAction = function (listen) {
+  var useProperties = function (keys, listen) {
     var ctx = React.useContext(context);
-    var forceUpdate = Utils$ReasonReactExamples.useForceUpdate(/* () */0);
-    var ref = React.useRef(ctx[/* state */0][0][/* action */1]);
+    var forceUpdate = Utils$ReScopedModel.useForceUpdate(/* () */0);
+    var initial = React.useMemo((function () {
+            return $$Array.map((function (key) {
+                          return Js_dict.get(ctx[/* state */0][0], key);
+                        }), keys);
+          }), keys);
+    var current = React.useRef(initial);
     var callback = React.useCallback((function (next) {
-            if (Caml_obj.caml_notequal(next[/* action */1], ref.current)) {
-              ref.current = next[/* action */1];
+            var carr = current.current;
+            var values = $$Array.copy(carr);
+            var doUpdate = /* record */[/* contents */false];
+            $$Array.iteri((function (index, item) {
+                    var cv = Caml_array.caml_array_get(carr, index);
+                    var nv = Js_dict.get(next, item);
+                    if (Caml_obj.caml_notequal(cv, nv)) {
+                      Caml_array.caml_array_set(values, index, nv);
+                      doUpdate[0] = true;
+                      return /* () */0;
+                    } else {
+                      return Caml_array.caml_array_set(values, index, cv);
+                    }
+                  }), keys);
+            if (doUpdate[0]) {
+              current.current = values;
               return Curry._1(forceUpdate, /* () */0);
             } else {
               return 0;
             }
-          }), /* array */[]);
+          }), keys);
     React.useEffect((function (param) {
             if (listen) {
               Curry._1(ctx[/* on */1], callback);
@@ -102,7 +125,7 @@ function Make(M) {
           listen,
           callback
         ]);
-    return ref.current;
+    return current.current;
   };
   return {
           context: context,
@@ -110,8 +133,8 @@ function Make(M) {
           EmitterProvider: EmitterProvider,
           EmitterConsumer: EmitterConsumer,
           Provider: Provider,
-          useState: useState,
-          useAction: useAction
+          useProperty: useProperty,
+          useProperties: useProperties
         };
 }
 
