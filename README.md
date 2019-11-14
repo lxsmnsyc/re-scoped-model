@@ -16,7 +16,7 @@ npm install --save @lxsmnsyc/re-scoped-model
 
 Models are created by using a hook function that is always called whenever its Provider renders, and must return an object that represents the models' state:
 
-```re
+```reason
 module CounterHook {
   /**
    * The type of our model state
@@ -60,7 +60,7 @@ module Counter = ReScopedModel.ScopedModel.Make(CounterHook);
 
 To add the Model to your component tree, simply use the `Provider` component property:
 
-```re
+```reason
 module App {
   [@react.component]
   let make = () => 
@@ -83,7 +83,7 @@ To access the property of the provided scoped Model, you need to use the `usePro
 
 You can also provide a boolean value to the second argument which tells the hook if it needs to listen for the changes.
 
-```re
+```reason
 module Count {
   [@react.component]
   let make = () => {
@@ -99,7 +99,7 @@ module Count {
 }
 ```
 
-```re
+```reason
 module Increment {
   [@react.component]
   let make = () => {
@@ -118,7 +118,7 @@ module Increment {
 }
 ```
 
-```re
+```reason
 module Decrement {
   [@react.component]
   let make = () => {
@@ -141,7 +141,7 @@ In our Counter app, only the Count component re-renders whenever any of the Mode
 
 To listen for multiple properties, you can use `.useProperties(keys: array(string), listen: boolean)` function, which returns the values of the properties in an array.
 
-```re
+```reason
 module IncDec {
   [@react.component]
   let make = () => {
