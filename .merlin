@@ -1,6 +1,6 @@
 ####{BSB GENERATED: NO EDIT
 B lib/bs
-FLG -open ReasonReactExamples
+FLG -open ReScopedModel
 FLG -ppx '/Users/Alexis/Documents/GitHub/re-scoped-model/node_modules/bs-platform/lib/bsppx.exe -bs-jsx 3'
 S /Users/Alexis/Documents/GitHub/re-scoped-model/node_modules/bs-platform/lib/ocaml
 B /Users/Alexis/Documents/GitHub/re-scoped-model/node_modules/bs-platform/lib/ocaml
