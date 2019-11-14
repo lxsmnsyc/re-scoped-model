@@ -1,7 +1,7 @@
 {
   "name": "@lxsmnsyc/re-scoped-model",
   "repository": "lxsmnsyc/re-scoped-model",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "scripts": {
     "build": "bsb -make-world",
     "start": "bsb -make-world -w -ws _ ",
