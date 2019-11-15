@@ -17,8 +17,8 @@
   "license": "MIT",
   "dependencies": {
     "@lxsmnsyc/re-scoped-model": "link:..",
-    "react": "^16.8.1",
-    "react-dom": "^16.8.1",
+    "react": "link:../node_modules/react",
+    "react-dom": "link:../node_modules/react-dom",
     "reason-react": ">=0.7.0"
   },
   "devDependencies": {
