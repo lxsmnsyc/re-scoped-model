@@ -10,6 +10,18 @@
 npm install --save @lxsmnsyc/re-scoped-model
 ```
 
+```bash
+yarn add @lxsmnsyc/re-scoped-model
+```
+
+### bsconfig.json
+
+```json
+  "bs-dependencies": [
+    "@lxsmnsyc/re-scoped-model"
+  ],
+```
+
 ## Usage
 
 ### Creating your Model
