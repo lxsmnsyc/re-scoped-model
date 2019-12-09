@@ -32,7 +32,9 @@
 module type Hook = {
   type t;
 
-  let call: unit => t;
+  type props;
+
+  let call: props => t;
 };
 
 /**
@@ -75,10 +77,10 @@ module Make = (M: Hook) => {
    */
   module EmitterConsumer {
     [@react.component]
-    let make = (~children) => {
+    let make = (~value, ~children) => {
       let ctx = React.useContext(context);
 
-      let model = M.call();
+      let model = M.call(value);
 
       ctx.consume(Some(model));
 
@@ -91,9 +93,9 @@ module Make = (M: Hook) => {
    */ 
   module Provider {
     [@react.component]
-    let make = (~children) => {
+    let make = (~value, ~children) => {
       <EmitterProvider>
-        <EmitterConsumer>
+        <EmitterConsumer value>
           children
         </EmitterConsumer>
       </EmitterProvider>
