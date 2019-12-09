@@ -1,11 +1,8 @@
 'use strict';
 
-var Block = require("bs-platform/lib/js/block.js");
 var Curry = require("bs-platform/lib/js/curry.js");
 var React = require("react");
-var Js_dict = require("bs-platform/lib/js/js_dict.js");
 var ReactDom = require("react-dom");
-var Caml_builtin_exceptions = require("bs-platform/lib/js/caml_builtin_exceptions.js");
 var ScopedModel$ReScopedModel = require("@lxsmnsyc/re-scoped-model/src/ScopedModel.bs.js");
 
 function call(param) {
@@ -23,25 +20,11 @@ function call(param) {
                         return c - 1 | 0;
                       }));
         }), /* array */[]);
-  return Js_dict.fromList(/* :: */[
-              /* tuple */[
-                "increment",
-                /* Increment */Block.__(0, [increment])
-              ],
-              /* :: */[
-                /* tuple */[
-                  "decrement",
-                  /* Decrement */Block.__(1, [decrement])
-                ],
-                /* :: */[
-                  /* tuple */[
-                    "count",
-                    /* Count */Block.__(2, [match[0]])
-                  ],
-                  /* [] */0
-                ]
-              ]
-            ]);
+  return /* record */[
+          /* increment */increment,
+          /* decrement */decrement,
+          /* count */match[0]
+        ];
 }
 
 var CounterHook = {
@@ -51,18 +34,12 @@ var CounterHook = {
 var Counter = ScopedModel$ReScopedModel.Make(CounterHook);
 
 function Example$Count(Props) {
-  var count = Curry._2(Counter.useProperty, "count", true);
+  var count = Curry._2(Counter.useSelector, (function (state) {
+          return state[/* count */2];
+        }), true);
   console.log("Count");
   if (count !== undefined) {
-    var match = count;
-    switch (match.tag | 0) {
-      case /* Increment */0 :
-      case /* Decrement */1 :
-          return null;
-      case /* Count */2 :
-          return React.createElement("p", undefined, String(match[0]));
-      
-    }
+    return React.createElement("p", undefined, String(count));
   } else {
     return null;
   }
@@ -73,23 +50,17 @@ var Count = {
 };
 
 function Example$Increment(Props) {
-  var increment = Curry._2(Counter.useProperty, "increment", true);
+  var increment = Curry._2(Counter.useSelector, (function (state) {
+          return state[/* increment */0];
+        }), true);
   console.log("Increment");
   if (increment !== undefined) {
-    var match = increment;
-    switch (match.tag | 0) {
-      case /* Increment */0 :
-          var value = match[0];
-          return React.createElement("button", {
-                      onClick: (function (param) {
-                          return Curry._1(value, /* () */0);
-                        })
-                    }, "Increment");
-      case /* Decrement */1 :
-      case /* Count */2 :
-          return null;
-      
-    }
+    var value = increment;
+    return React.createElement("button", {
+                onClick: (function (param) {
+                    return Curry._1(value, /* () */0);
+                  })
+              }, "Increment");
   } else {
     return null;
   }
@@ -100,23 +71,17 @@ var Increment = {
 };
 
 function Example$Decrement(Props) {
-  var decrement = Curry._2(Counter.useProperty, "decrement", true);
+  var decrement = Curry._2(Counter.useSelector, (function (state) {
+          return state[/* decrement */1];
+        }), true);
   console.log("Decrement");
   if (decrement !== undefined) {
-    var match = decrement;
-    switch (match.tag | 0) {
-      case /* Decrement */1 :
-          var value = match[0];
-          return React.createElement("button", {
-                      onClick: (function (param) {
-                          return Curry._1(value, /* () */0);
-                        })
-                    }, "Decrement");
-      case /* Increment */0 :
-      case /* Count */2 :
-          return null;
-      
-    }
+    var value = decrement;
+    return React.createElement("button", {
+                onClick: (function (param) {
+                    return Curry._1(value, /* () */0);
+                  })
+              }, "Decrement");
   } else {
     return null;
   }
@@ -127,68 +92,35 @@ var Decrement = {
 };
 
 function Example$IncDec(Props) {
-  var match = Curry._2(Counter.useProperties, /* array */[
-        "increment",
-        "decrement"
-      ], true);
-  if (match.length !== 2) {
-    throw [
-          Caml_builtin_exceptions.match_failure,
-          /* tuple */[
-            "Example.re",
-            80,
-            8
-          ]
-        ];
-  }
-  var increment = match[0];
-  var decrement = match[1];
+  var actions = Curry._2(Counter.useSelector, (function (state) {
+          return /* array */[
+                  state[/* increment */0],
+                  state[/* decrement */1]
+                ];
+        }), true);
   console.log("IncDec");
-  var tmp;
-  if (increment !== undefined) {
-    var match$1 = increment;
-    switch (match$1.tag | 0) {
-      case /* Increment */0 :
-          var value = match$1[0];
-          tmp = React.createElement("button", {
-                onClick: (function (param) {
-                    return Curry._1(value, /* () */0);
-                  })
-              }, "Increment");
-          break;
-      case /* Decrement */1 :
-      case /* Count */2 :
-          tmp = null;
-          break;
-      
+  if (actions !== undefined) {
+    var match = actions;
+    if (match.length !== 2) {
+      return null;
+    } else {
+      var increment = match[0];
+      var decrement = match[1];
+      return React.createElement(React.Fragment, {
+                  children: null
+                }, React.createElement("button", {
+                      onClick: (function (param) {
+                          return Curry._1(increment, /* () */0);
+                        })
+                    }, "Increment"), React.createElement("button", {
+                      onClick: (function (param) {
+                          return Curry._1(decrement, /* () */0);
+                        })
+                    }, "Decrement"));
     }
   } else {
-    tmp = null;
+    return null;
   }
-  var tmp$1;
-  if (decrement !== undefined) {
-    var match$2 = decrement;
-    switch (match$2.tag | 0) {
-      case /* Decrement */1 :
-          var value$1 = match$2[0];
-          tmp$1 = React.createElement("button", {
-                onClick: (function (param) {
-                    return Curry._1(value$1, /* () */0);
-                  })
-              }, "Decrement");
-          break;
-      case /* Increment */0 :
-      case /* Count */2 :
-          tmp$1 = null;
-          break;
-      
-    }
-  } else {
-    tmp$1 = null;
-  }
-  return React.createElement(React.Fragment, {
-              children: null
-            }, tmp, tmp$1);
 }
 
 var IncDec = {
