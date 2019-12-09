@@ -32,7 +32,7 @@
 module type Hook = {
   type t;
 
-  let call: unit => Js.Dict.t(t);
+  let call: unit => t;
 };
 
 /**
@@ -42,7 +42,7 @@ module Make = (M: Hook) => {
   /**
    *  Create Context
    */
-  let context = React.createContext(Emitter.make(Js.Dict.empty()));
+  let context = React.createContext(Emitter.make(None));
 
   /**
    * Wrap the Provider component
@@ -62,7 +62,7 @@ module Make = (M: Hook) => {
   module EmitterProvider {
     [@react.component]
     let make = (~children) => {
-      let emitter = React.useMemo1(() => Emitter.make(Js.Dict.empty()), [||]);
+      let emitter = React.useMemo1(() => Emitter.make(None), [||]);
 
       <ContextProvider value=emitter>
         children
@@ -80,7 +80,7 @@ module Make = (M: Hook) => {
 
       let model = M.call();
 
-      ctx.consume(model);
+      ctx.consume(Some(model));
 
       children
     };
@@ -100,23 +100,33 @@ module Make = (M: Hook) => {
     }
   }
 
-  /**
-   * A hook used for listening to a model's property value change.
-   */
-  let useProperty = (key: string, listen: bool): option(M.t) => {
-    let ctx: Emitter.t(Js.Dict.t(M.t)) = React.useContext(context);
+  let useSelector = (selector: M.t => 'a, listen: bool): option('a) => {
+    let ctx: Emitter.t(option(M.t)) = React.useContext(context);
 
     let forceUpdate = Utils.useForceUpdate();
 
-    let ref = React.useRef(Js.Dict.get(ctx.state^, key));
-
-    let callback = React.useCallback1((next: Js.Dict.t(M.t)) => {
-      let value = Js.Dict.get(next, key);
-      if (value != React.Ref.current(ref)) {
-        React.Ref.setCurrent(ref, value);
-        forceUpdate();
+    let state = React.useMemo1(() => {
+      switch (ctx.state^) {
+        | Some(value) => Some(selector(value));
+        | None => None;
       }
-    }, [| key |]);
+    }, [||]);
+
+    let ref = Utils.useNativeRef(state);
+
+    let callback = React.useCallback1((next: option(M.t)) => {
+      switch (next) {
+        | Some(value) => {
+          let result = selector(value);
+
+          if (Some(result) != ref^) {
+            ref := Some(result);
+            forceUpdate();
+          }
+        }
+        | None => ();
+      }
+    }, [| selector |]);
 
     React.useEffect3(() => {
       if (listen) {
@@ -128,47 +138,51 @@ module Make = (M: Hook) => {
       }
     }, (ctx, listen, callback));
 
-    React.Ref.current(ref);
+    ref^;
   };
 
-  /**
-   * A hook used for listening to a model's properties changes.
-   */ 
-  let useProperties = (keys: array(string), listen: bool): array(option(M.t)) => {
-    let ctx: Emitter.t(Js.Dict.t(M.t)) = React.useContext(context);
+  let useSelectors = (selector: M.t => array('a), listen: bool): option(array('a)) => {
+    let ctx: Emitter.t(option(M.t)) = React.useContext(context);
 
     let forceUpdate = Utils.useForceUpdate();
 
-    let initial = React.useMemo1(() => {
-      keys |> Array.map(key => Js.Dict.get(ctx.state^, key));
-    }, keys);
-
-    let current = React.useRef(initial);
-
-    let callback = React.useCallback1((next: Js.Dict.t(M.t)) => {
-      let carr = React.Ref.current(current);
-
-      let values = Array.copy(carr);
-
-      let doUpdate = ref(false);
-
-      keys |> Array.iteri((index, item) => {
-        let cv = carr->Array.get(index);
-        let nv = Js.Dict.get(next, item);
-
-        if (cv != nv) {
-          Array.set(values, index, nv);
-          doUpdate := true;
-        } else {
-          Array.set(values, index, cv);
-        }
-      });
-
-      if (doUpdate^) {
-        React.Ref.setCurrent(current, values);
-        forceUpdate();
+    let state = React.useMemo1(() => {
+      switch (ctx.state^) {
+        | Some(value) => Some(selector(value));
+        | None => None;
       }
-    }, keys);
+    }, [||]);
+
+    let refs: ref(option(array('a))) = Utils.useNativeRef(state);
+
+    let callback = React.useCallback1((next: option(M.t)) => {
+      switch (next) {
+        | Some(value) => {
+          let result = selector(value);
+
+          let doUpdate: ref(bool) = ref(false);
+
+          switch (refs^) {
+            | Some(values) => {
+              values |> Array.iteri((k, v) => {
+                let nv = Array.get(result, k);
+    
+                if (nv != v) {
+                  doUpdate := true;
+                }
+              });
+            }
+            | None => doUpdate := true;
+          }
+
+          if (doUpdate^) {
+            refs := Some(result);
+            forceUpdate();
+          }
+        }
+        | None => ();
+      }
+    }, [| selector |]);
 
     React.useEffect3(() => {
       if (listen) {
@@ -180,7 +194,7 @@ module Make = (M: Hook) => {
       }
     }, (ctx, listen, callback));
 
-    React.Ref.current(current);
+    refs^;
   };
 };
 
