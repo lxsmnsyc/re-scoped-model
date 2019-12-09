@@ -13,5 +13,10 @@ function useForceUpdate(param) {
               }), /* array */[]);
 }
 
+function useNativeRef(initial) {
+  return React.useRef(/* record */[/* contents */initial]).current;
+}
+
 exports.useForceUpdate = useForceUpdate;
+exports.useNativeRef = useNativeRef;
 /* react Not a pure module */
