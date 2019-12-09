@@ -36,8 +36,10 @@ module CounterHook {
     count: int,
   };
 
-  let call = (): t => {
-    let (count, setCount) = React.useState(() => 0);
+  type props = int;
+
+  let call = (initial: props): t => {
+    let (count, setCount) = React.useState(() => initial);
 
     let increment = React.useCallback1(() => setCount(c => c + 1), [||]);
     let decrement = React.useCallback1(() => setCount(c => c - 1), [||]);
@@ -64,11 +66,11 @@ To add the Model to your component tree, simply use the `Provider` component pro
 module App {
   [@react.component]
   let make = () => 
-    <Counter.Provider>
+    <Counter.Provider value=0>
       <Count />
       <Increment />
       <Decrement />
-      <Counter.Provider>
+      <Counter.Provider value=100>
         <Count />
         <IncDec />
       </Counter.Provider>
