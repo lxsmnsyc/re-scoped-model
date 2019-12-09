@@ -30,35 +30,23 @@ Models are created by using a hook function that is always called whenever its P
 
 ```reason
 module CounterHook {
-  /**
-   * The type of our model state
-   */
-  type t =
-    | Increment(unit => unit)
-    | Decrement(unit => unit)
-    | Count(int)
-  ;
+  type t = {
+    increment: unit => unit,
+    decrement: unit => unit,
+    count: int,
+  };
 
-  /**
-   * Our hook function
-   * 
-   * Called initial when we mount the Provide component of the generated
-   * model.
-   */
-  let call = (): Js.Dict.t(t) => {
+  let call = (): t => {
     let (count, setCount) = React.useState(() => 0);
 
     let increment = React.useCallback1(() => setCount(c => c + 1), [||]);
     let decrement = React.useCallback1(() => setCount(c => c - 1), [||]);
 
-    /**
-     * Return our model state
-     */    
-    Js.Dict.fromList([
-      ("increment", Increment(increment)),
-      ("decrement", Decrement(decrement)),
-      ("count", Count(count)),
-    ]);
+    {
+      increment,
+      decrement,
+      count,
+    }
   };
 };
 
@@ -89,22 +77,22 @@ module App {
 }
 ```
 
-### useProperty Hook
+### useSelector Hook
 
-To access the property of the provided scoped Model, you need to use the `useProperty` function from your Model instance. This function accesses the property as well as listens to the property changes, re-rendering the component.
+To access our model's state, we can use the `useSelector` hook which accepts a function that receives the current model state, and returns a new optional value that is derived from the given state. This allows fine-grained and reasonable re-render for the listening component.
 
-You can also provide a boolean value to the second argument which tells the hook if it needs to listen for the changes.
+For example, in our `Count` component, we only `select` the `count` field of our model record.
 
 ```reason
 module Count {
   [@react.component]
   let make = () => {
-    let count = Counter.useProperty("count", true);
+    let count = Counter.useSelector(state => state.count, true);
 
     Js.log("Count");
 
     switch (count) {
-      | Some(Count(value)) => <p>{ ReasonReact.string(string_of_int(value)) }</p>;
+      | Some(value) => <p>{ ReasonReact.string(string_of_int(value)) }</p>;
       | _ => ReasonReact.null;
     }
   }
@@ -115,12 +103,12 @@ module Count {
 module Increment {
   [@react.component]
   let make = () => {
-    let increment = Counter.useProperty("increment", true);
+    let increment = Counter.useSelector(state => state.increment, true);
 
     Js.log("Increment");
 
     switch (increment) {
-      | Some(Increment(value)) => 
+      | Some(value) => 
         <button onClick={_ => value()}>
           { ReasonReact.string("Increment") }
         </button>;
@@ -134,12 +122,12 @@ module Increment {
 module Decrement {
   [@react.component]
   let make = () => {
-    let decrement = Counter.useProperty("decrement", true);
+    let decrement = Counter.useSelector(state => state.decrement, true);
 
     Js.log("Decrement");
 
     switch (decrement) {
-      | Some(Decrement(value)) => 
+      | Some(value) => 
         <button onClick={_ => value()}>
           { ReasonReact.string("Decrement") }
         </button>;
@@ -151,36 +139,34 @@ module Decrement {
 
 In our Counter app, only the Count component re-renders whenever any of the Model actions are called.
 
-To listen for multiple properties, you can use `.useProperties(keys: array(string), listen: boolean)` function, which returns the values of the properties in an array.
+To transform the state and listen to multiple values, you can use `.useSelectors` function, which returns the values of the transformed state in an array.
 
 ```reason
+
 module IncDec {
   [@react.component]
   let make = () => {
-    let [| increment, decrement |] = Counter.useProperties([| "increment", "decrement" |], true);
+    let actions = Counter.useSelector(state => {
+      [|
+        state.increment,
+        state.decrement,
+      |]
+    }, true);
 
     Js.log("IncDec");
 
-    <React.Fragment>
-      {
-        switch (increment) {
-          | Some(Increment(value)) => 
-            <button onClick={_ => value()}>
-              { ReasonReact.string("Increment") }
-            </button>;
-          | _ => ReasonReact.null;
-        }
-      }
-      {
-        switch (decrement) {
-          | Some(Decrement(value)) => 
-            <button onClick={_ => value()}>
-              { ReasonReact.string("Decrement") }
-            </button>;
-          | _ => ReasonReact.null;
-        }
-      }
-    </React.Fragment>
+    switch (actions) {
+      | Some([| increment, decrement |]) => 
+        <React.Fragment>
+          <button onClick={_ => increment()}>
+            { ReasonReact.string("Increment") }
+          </button>
+          <button onClick={_ => decrement()}>
+            { ReasonReact.string("Decrement") }
+          </button>
+        </React.Fragment>
+      | _ => ReasonReact.null;
+    }
   }
 }
 ```
