@@ -3,24 +3,23 @@
 [@bs.val] external document: Js.t({..}) = "document";
 
 module CounterHook {
-  type t =
-    | Increment(unit => unit)
-    | Decrement(unit => unit)
-    | Count(int)
-  ;
+  type t = {
+    increment: unit => unit,
+    decrement: unit => unit,
+    count: int,
+  };
 
-  let call = (): Js.Dict.t(t) => {
+  let call = (): t => {
     let (count, setCount) = React.useState(() => 0);
 
     let increment = React.useCallback1(() => setCount(c => c + 1), [||]);
     let decrement = React.useCallback1(() => setCount(c => c - 1), [||]);
 
-    
-    Js.Dict.fromList([
-      ("increment", Increment(increment)),
-      ("decrement", Decrement(decrement)),
-      ("count", Count(count)),
-    ]);
+    {
+      increment,
+      decrement,
+      count,
+    }
   };
 };
 
@@ -29,12 +28,12 @@ module Counter = ReScopedModel.ScopedModel.Make(CounterHook);
 module Count {
   [@react.component]
   let make = () => {
-    let count = Counter.useProperty("count", true);
+    let count = Counter.useSelector(state => state.count, true);
 
     Js.log("Count");
 
     switch (count) {
-      | Some(Count(value)) => <p>{ ReasonReact.string(string_of_int(value)) }</p>;
+      | Some(value) => <p>{ ReasonReact.string(string_of_int(value)) }</p>;
       | _ => ReasonReact.null;
     }
   }
@@ -43,12 +42,12 @@ module Count {
 module Increment {
   [@react.component]
   let make = () => {
-    let increment = Counter.useProperty("increment", true);
+    let increment = Counter.useSelector(state => state.increment, true);
 
     Js.log("Increment");
 
     switch (increment) {
-      | Some(Increment(value)) => 
+      | Some(value) => 
         <button onClick={_ => value()}>
           { ReasonReact.string("Increment") }
         </button>;
@@ -60,12 +59,12 @@ module Increment {
 module Decrement {
   [@react.component]
   let make = () => {
-    let decrement = Counter.useProperty("decrement", true);
+    let decrement = Counter.useSelector(state => state.decrement, true);
 
     Js.log("Decrement");
 
     switch (decrement) {
-      | Some(Decrement(value)) => 
+      | Some(value) => 
         <button onClick={_ => value()}>
           { ReasonReact.string("Decrement") }
         </button>;
@@ -77,30 +76,27 @@ module Decrement {
 module IncDec {
   [@react.component]
   let make = () => {
-    let [| increment, decrement |] = Counter.useProperties([| "increment", "decrement" |], true);
+    let actions = Counter.useSelector(state => {
+      [|
+        state.increment,
+        state.decrement,
+      |]
+    }, true);
 
     Js.log("IncDec");
 
-    <React.Fragment>
-      {
-        switch (increment) {
-          | Some(Increment(value)) => 
-            <button onClick={_ => value()}>
-              { ReasonReact.string("Increment") }
-            </button>;
-          | _ => ReasonReact.null;
-        }
-      }
-      {
-        switch (decrement) {
-          | Some(Decrement(value)) => 
-            <button onClick={_ => value()}>
-              { ReasonReact.string("Decrement") }
-            </button>;
-          | _ => ReasonReact.null;
-        }
-      }
-    </React.Fragment>
+    switch (actions) {
+      | Some([| increment, decrement |]) => 
+        <React.Fragment>
+          <button onClick={_ => increment()}>
+            { ReasonReact.string("Increment") }
+          </button>
+          <button onClick={_ => decrement()}>
+            { ReasonReact.string("Decrement") }
+          </button>
+        </React.Fragment>
+      | _ => ReasonReact.null;
+    }
   }
 }
 
