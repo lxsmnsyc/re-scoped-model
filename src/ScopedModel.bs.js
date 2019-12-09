@@ -33,9 +33,10 @@ function Make(M) {
     make: ScopedModel$Make$EmitterProvider
   };
   var ScopedModel$Make$EmitterConsumer = function (Props) {
+    var value = Props.value;
     var children = Props.children;
     var ctx = React.useContext(context);
-    var model = Curry._1(M.call, /* () */0);
+    var model = Curry._1(M.call, value);
     Curry._1(ctx[/* consume */3], Caml_option.some(model));
     return children;
   };
@@ -43,9 +44,11 @@ function Make(M) {
     make: ScopedModel$Make$EmitterConsumer
   };
   var ScopedModel$Make$Provider = function (Props) {
+    var value = Props.value;
     var children = Props.children;
     return React.createElement(ScopedModel$Make$EmitterProvider, {
                 children: React.createElement(ScopedModel$Make$EmitterConsumer, {
+                      value: value,
                       children: children
                     })
               });
