@@ -5,9 +5,9 @@ var React = require("react");
 var ReactDom = require("react-dom");
 var ScopedModel$ReScopedModel = require("@lxsmnsyc/re-scoped-model/src/ScopedModel.bs.js");
 
-function call(param) {
+function call(initial) {
   var match = React.useState((function () {
-          return 0;
+          return initial;
         }));
   var setCount = match[1];
   var increment = React.useCallback((function (param) {
@@ -129,8 +129,10 @@ var IncDec = {
 
 function Example$App(Props) {
   return React.createElement(Counter.Provider.make, {
+              value: 0,
               children: null
             }, React.createElement(Example$Count, { }), React.createElement(Example$Increment, { }), React.createElement(Example$Decrement, { }), React.createElement(Counter.Provider.make, {
+                  value: 100,
                   children: null
                 }, React.createElement(Example$Count, { }), React.createElement(Example$IncDec, { })));
 }
