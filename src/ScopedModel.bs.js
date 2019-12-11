@@ -37,7 +37,7 @@ function Make(M) {
     var children = Props.children;
     var ctx = React.useContext(context);
     var model = Curry._1(M.call, value);
-    Curry._1(ctx[/* consume */3], Caml_option.some(model));
+    Curry._1(ctx.consume, Caml_option.some(model));
     return children;
   };
   var EmitterConsumer = {
@@ -60,7 +60,7 @@ function Make(M) {
     var ctx = React.useContext(context);
     var forceUpdate = Utils$ReScopedModel.useForceUpdate(/* () */0);
     var state = React.useMemo((function () {
-            var match = ctx[/* state */0][0];
+            var match = ctx.state.contents;
             if (match !== undefined) {
               return Caml_option.some(Curry._1(selector, Caml_option.valFromOption(match)));
             }
@@ -70,8 +70,8 @@ function Make(M) {
     var callback = React.useCallback((function (next) {
             if (next !== undefined) {
               var result = Curry._1(selector, Caml_option.valFromOption(next));
-              if (Caml_obj.caml_notequal(Caml_option.some(result), ref[0])) {
-                ref[0] = Caml_option.some(result);
+              if (Caml_obj.caml_notequal(Caml_option.some(result), ref.contents)) {
+                ref.contents = Caml_option.some(result);
                 return Curry._1(forceUpdate, /* () */0);
               } else {
                 return 0;
@@ -82,9 +82,9 @@ function Make(M) {
           }), /* array */[selector]);
     React.useEffect((function (param) {
             if (listen) {
-              Curry._1(ctx[/* on */1], callback);
+              Curry._1(ctx.on, callback);
               return (function (param) {
-                        return Curry._1(ctx[/* off */2], callback);
+                        return Curry._1(ctx.off, callback);
                       });
             }
             
@@ -93,13 +93,13 @@ function Make(M) {
           listen,
           callback
         ]);
-    return ref[0];
+    return ref.contents;
   };
   var useSelectors = function (selector, listen) {
     var ctx = React.useContext(context);
     var forceUpdate = Utils$ReScopedModel.useForceUpdate(/* () */0);
     var state = React.useMemo((function () {
-            var match = ctx[/* state */0][0];
+            var match = ctx.state.contents;
             if (match !== undefined) {
               return Curry._1(selector, Caml_option.valFromOption(match));
             }
@@ -109,23 +109,25 @@ function Make(M) {
     var callback = React.useCallback((function (next) {
             if (next !== undefined) {
               var result = Curry._1(selector, Caml_option.valFromOption(next));
-              var doUpdate = /* record */[/* contents */false];
-              var match = refs[0];
+              var doUpdate = {
+                contents: false
+              };
+              var match = refs.contents;
               if (match !== undefined) {
                 $$Array.iteri((function (k, v) {
                         var nv = Caml_array.caml_array_get(result, k);
                         if (Caml_obj.caml_notequal(nv, v)) {
-                          doUpdate[0] = true;
+                          doUpdate.contents = true;
                           return /* () */0;
                         } else {
                           return 0;
                         }
                       }), match);
               } else {
-                doUpdate[0] = true;
+                doUpdate.contents = true;
               }
-              if (doUpdate[0]) {
-                refs[0] = result;
+              if (doUpdate.contents) {
+                refs.contents = result;
                 return Curry._1(forceUpdate, /* () */0);
               } else {
                 return 0;
@@ -136,9 +138,9 @@ function Make(M) {
           }), /* array */[selector]);
     React.useEffect((function (param) {
             if (listen) {
-              Curry._1(ctx[/* on */1], callback);
+              Curry._1(ctx.on, callback);
               return (function (param) {
-                        return Curry._1(ctx[/* off */2], callback);
+                        return Curry._1(ctx.off, callback);
                       });
             }
             
@@ -147,7 +149,7 @@ function Make(M) {
           listen,
           callback
         ]);
-    return refs[0];
+    return refs.contents;
   };
   return {
           context: context,

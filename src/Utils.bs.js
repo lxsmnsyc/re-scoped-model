@@ -14,7 +14,9 @@ function useForceUpdate(param) {
 }
 
 function useNativeRef(initial) {
-  return React.useRef(/* record */[/* contents */initial]).current;
+  return React.useRef({
+              contents: initial
+            }).current;
 }
 
 exports.useForceUpdate = useForceUpdate;
