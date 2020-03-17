@@ -3,8 +3,11 @@
 
 
 "@lxsmnsyc/re-scoped-model@link:..":
-  version "0.0.0"
-  uid ""
+  version "0.4.0"
+  dependencies:
+    react "^16.8.1"
+    react-dom "^16.8.1"
+    reason-react ">=0.7.0"
 
 bs-platform@^5.2.1:
   version "5.2.1"
@@ -56,9 +59,9 @@ mime@^2.4.1:
   integrity sha512-LRxmNwziLPT828z+4YkNzloCFC2YM4wrB99k+AV5ZbEyfGNWfG8SO1FUXLmLDBSo89NrJZ4DIWeLjy1CHGhMGA==
 
 minimist@^1.1.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.0.tgz#a35008b20f41383eec1fb914f4cd5df79a264284"
-  integrity sha1-o1AIsg9BOD7sH7kU9M1d95omQoQ=
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
+  integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
 
 moduleserve@^0.8.4:
   version "0.8.5"
@@ -100,7 +103,6 @@ react-dom@>=16.8.1, react-dom@^16.8.1:
 
 "react-dom@link:../node_modules/react-dom":
   version "0.0.0"
-  uid ""
 
 react-is@^16.8.1:
   version "16.11.0"
@@ -118,7 +120,6 @@ react@>=16.8.1, react@^16.8.1:
 
 "react@link:../node_modules/react":
   version "0.0.0"
-  uid ""
 
 reason-react@>=0.7.0:
   version "0.7.0"
