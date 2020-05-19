@@ -1,11 +1,12 @@
-let useForceUpdate = () => {
-  let (_, set) = React.useReducer((state, _) => !state, false);
+let useConstant = (supplier: unit => 'a): 'a => {
+  let ref: React.ref(option('a)) = React.useRef(None);
 
-  React.useCallback1(() => set(), [||]);
-};
-
-let useNativeRef = (initial) => {
-  let ref = React.useRef(ref(initial));
-
-  React.Ref.current(ref);
+  switch (ref.current) {
+    | Some(value) => value;
+    | None => {
+      let value = supplier();
+      ref.current = Some(value);
+      value;
+    }
+  }
 };
