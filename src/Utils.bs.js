@@ -4,16 +4,6 @@ var Curry = require("bs-platform/lib/js/curry.js");
 var React = require("react");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 
-function useForceUpdate(param) {
-  var match = React.useReducer((function (state, param) {
-          return !state;
-        }), false);
-  var set = match[1];
-  return React.useCallback((function (param) {
-                return Curry._1(set, undefined);
-              }), []);
-}
-
 function useConstant(supplier) {
   var ref = React.useRef(undefined);
   var value = ref.current;
@@ -25,6 +15,5 @@ function useConstant(supplier) {
   return value$1;
 }
 
-exports.useForceUpdate = useForceUpdate;
 exports.useConstant = useConstant;
 /* react Not a pure module */
