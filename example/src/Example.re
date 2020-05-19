@@ -1,7 +1,7 @@
-// Entry point
-open ReScopedModel;
 
 [@bs.val] external document: Js.t({..}) = "document";
+
+open ReScopedModel;
 
 module CounterHook {
   type t = {
@@ -68,7 +68,7 @@ module Decrement {
 module IncDec {
   [@react.component]
   let make = () => {
-    let [| increment, decrement |] = Counter.useSelector(state => {
+    let [| increment, decrement |] = Counter.useSelectors(state => {
       [|
         state.increment,
         state.decrement,

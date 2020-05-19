@@ -79,7 +79,7 @@ var Decrement = {
 };
 
 function Example$IncDec(Props) {
-  var match = Curry._2(Counter.useSelector, (function (state) {
+  var match = Curry._2(Counter.useSelectors, (function (state) {
           return [
                   state.increment,
                   state.decrement
