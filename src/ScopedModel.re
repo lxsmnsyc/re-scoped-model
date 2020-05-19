@@ -25,7 +25,8 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2019
  */
-
+exception MissingScopedModelException;
+exception DesyncScopedModelException;
 /**
  * Type definition of a hook module
  */
@@ -44,7 +45,7 @@ module Make = (M: Hook) => {
   /**
    *  Create Context
    */
-  let context = React.createContext(Emitter.make(None));
+  let context: React.Context.t(option(Emitter.t(M.t))) = React.createContext(None);
 
   /**
    * Wrap the Provider component
@@ -64,12 +65,32 @@ module Make = (M: Hook) => {
   module EmitterProvider {
     [@react.component]
     let make = (~children) => {
-      let emitter = React.useMemo1(() => Emitter.make(None), [||]);
+      let emitter = Utils.useConstant(() => Some(Emitter.make()));
 
       <ContextProvider value=emitter>
         children
       </ContextProvider>
-    }
+    };
+  }
+
+  module ProvidedEmitter {
+    let use = (): Emitter.t(M.t) => {
+      let emitter = React.useContext(context);
+
+      switch (emitter) {
+        | Some(actualEmitter) => actualEmitter;
+        | None => raise(MissingScopedModelException);
+      }
+    };
+
+    let useValue = (emitter: Emitter.t(M.t)): M.t => {
+      let value = emitter.getState();
+
+      switch (value) {
+        | Some(actualValue) => actualValue;
+        | None => raise(DesyncScopedModelException);
+      }
+    };
   }
 
   /**
@@ -78,13 +99,19 @@ module Make = (M: Hook) => {
   module EmitterConsumer {
     [@react.component]
     let make = (~value, ~children) => {
-      let ctx = React.useContext(context);
+      let ctx = ProvidedEmitter.use();
 
       let model = M.call(value);
 
-      ctx.consume(Some(model));
+      ctx.sync(model);
 
-      children
+      React.useEffect2(() => {
+        ctx.consume(model);
+
+        None;
+      }, (ctx, model));
+
+      children;
     };
   }
 
@@ -102,101 +129,70 @@ module Make = (M: Hook) => {
     }
   }
 
-  let useSelector = (selector: M.t => 'a, listen: bool): option('a) => {
-    let ctx: Emitter.t(option(M.t)) = React.useContext(context);
+  let useSelector = (selector: M.t => 'a, listen: bool): 'a => {
+    let ctx = ProvidedEmitter.use();
 
-    let forceUpdate = Utils.useForceUpdate();
+    let internalValue = ProvidedEmitter.useValue(ctx);
 
-    let state = React.useMemo1(() => {
-      switch (ctx.state^) {
-        | Some(value) => Some(selector(value));
-        | None => None;
-      }
-    }, [||]);
-
-    let ref = Utils.useNativeRef(state);
-
-    let callback = React.useCallback1((next: option(M.t)) => {
-      switch (next) {
-        | Some(value) => {
-          let result = selector(value);
-
-          if (Some(result) != ref^) {
-            ref := Some(result);
-            forceUpdate();
-          }
-        }
-        | None => ();
-      }
-    }, [| selector |]);
+    let (state, setState) = React.useState(() => selector(internalValue));
 
     React.useEffect3(() => {
       if (listen) {
+        let callback = (next: M.t) => {
+          setState(() => selector(next));
+        };
+
         ctx.on(callback);
 
         Some(() => ctx.off(callback));
       } else {
         None;
       }
-    }, (ctx, listen, callback));
+    }, (ctx, listen, setState));
 
-    ref^;
+    state;
   };
 
-  let useSelectors = (selector: M.t => array('a), listen: bool): option(array('a)) => {
-    let ctx: Emitter.t(option(M.t)) = React.useContext(context);
+  let useSelectors = (selector: M.t => array('a), listen: bool): array('a) => {
+    let ctx = ProvidedEmitter.use();
 
-    let forceUpdate = Utils.useForceUpdate();
+    let internalValue = ProvidedEmitter.useValue(ctx);
 
-    let state = React.useMemo1(() => {
-      switch (ctx.state^) {
-        | Some(value) => Some(selector(value));
-        | None => None;
-      }
-    }, [||]);
+    let (state, setState) = React.useState(() => selector(internalValue));
 
-    let refs: ref(option(array('a))) = Utils.useNativeRef(state);
-
-    let callback = React.useCallback1((next: option(M.t)) => {
-      switch (next) {
-        | Some(value) => {
-          let result = selector(value);
+    React.useEffect3(() => {
+      if (listen) {
+        let callback = (next: M.t) => {
+          let result = selector(next);
 
           let doUpdate: ref(bool) = ref(false);
 
-          switch (refs^) {
-            | Some(values) => {
-              values |> Array.iteri((k, v) => {
-                let nv = Array.get(result, k);
-    
-                if (nv != v) {
-                  doUpdate := true;
-                }
-              });
+          setState((prev) => {
+            prev |> Array.iteri((k, v) => {
+              let nv = Array.get(result, k);
+  
+              if (nv != v) {
+                doUpdate := true;
+              }
+            });
+
+            if (doUpdate^) {
+              result;
+            } else {
+              prev;
             }
-            | None => doUpdate := true;
-          }
+          });
+        };
 
-          if (doUpdate^) {
-            refs := Some(result);
-            forceUpdate();
-          }
-        }
-        | None => ();
-      }
-    }, [| selector |]);
-
-    React.useEffect3(() => {
-      if (listen) {
         ctx.on(callback);
 
         Some(() => ctx.off(callback));
       } else {
         None;
       }
-    }, (ctx, listen, callback));
+    }, (ctx, listen, setState));
 
-    refs^;
+    state;
   };
 };
 
