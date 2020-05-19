@@ -19,10 +19,10 @@
     "@lxsmnsyc/re-scoped-model": "link:..",
     "react": "link:../node_modules/react",
     "react-dom": "link:../node_modules/react-dom",
-    "reason-react": ">=0.7.0"
+    "reason-react": "^0.8.0"
   },
   "devDependencies": {
-    "bs-platform": "^5.2.1",
-    "moduleserve": "^0.8.4"
+    "bs-platform": "^7.3.2",
+    "moduleserve": "^0.9.1"
   }
 }

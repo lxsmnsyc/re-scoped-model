@@ -1,4 +1,5 @@
 // Entry point
+open ReScopedModel;
 
 [@bs.val] external document: Js.t({..}) = "document";
 
@@ -25,7 +26,7 @@ module CounterHook {
   };
 };
 
-module Counter = ReScopedModel.ScopedModel.Make(CounterHook);
+module Counter = ScopedModel.Make(CounterHook);
 
 module Count {
   [@react.component]
@@ -34,10 +35,7 @@ module Count {
 
     Js.log("Count");
 
-    switch (count) {
-      | Some(value) => <p>{ ReasonReact.string(string_of_int(value)) }</p>;
-      | _ => ReasonReact.null;
-    }
+    <p>{ ReasonReact.string(string_of_int(count)) }</p>;
   }
 }
 
@@ -48,13 +46,9 @@ module Increment {
 
     Js.log("Increment");
 
-    switch (increment) {
-      | Some(value) => 
-        <button onClick={_ => value()}>
-          { ReasonReact.string("Increment") }
-        </button>;
-      | _ => ReasonReact.null;
-    }
+    <button onClick={_ => increment()}>
+      { ReasonReact.string("Increment") }
+    </button>;
   }
 }
 
@@ -65,40 +59,32 @@ module Decrement {
 
     Js.log("Decrement");
 
-    switch (decrement) {
-      | Some(value) => 
-        <button onClick={_ => value()}>
-          { ReasonReact.string("Decrement") }
-        </button>;
-      | _ => ReasonReact.null;
-    }
+    <button onClick={_ => decrement()}>
+      { ReasonReact.string("Decrement") }
+    </button>;
   }
 }
 
 module IncDec {
   [@react.component]
   let make = () => {
-    let actions = Counter.useSelector(state => {
+    let [| increment, decrement |] = Counter.useSelector(state => {
       [|
         state.increment,
         state.decrement,
-      |]
+      |];
     }, true);
 
     Js.log("IncDec");
 
-    switch (actions) {
-      | Some([| increment, decrement |]) => 
-        <React.Fragment>
-          <button onClick={_ => increment()}>
-            { ReasonReact.string("Increment") }
-          </button>
-          <button onClick={_ => decrement()}>
-            { ReasonReact.string("Decrement") }
-          </button>
-        </React.Fragment>
-      | _ => ReasonReact.null;
-    }
+    <React.Fragment>
+      <button onClick={_ => increment()}>
+        { ReasonReact.string("Increment") }
+      </button>
+      <button onClick={_ => decrement()}>
+        { ReasonReact.string("Decrement") }
+      </button>
+    </React.Fragment>
   }
 }
 
