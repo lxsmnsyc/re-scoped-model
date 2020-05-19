@@ -15,54 +15,54 @@ module CounterHook {
   let call = (initial: props): t => {
     let (count, setCount) = React.useState(() => initial);
 
-    let increment = React.useCallback1(() => setCount(c => c + 1), [||]);
-    let decrement = React.useCallback1(() => setCount(c => c - 1), [||]);
+    let increment = React.useCallback0(() => setCount(c => c + 1));
+    let decrement = React.useCallback0(() => setCount(c => c - 1));
 
     {
       increment,
       decrement,
       count,
-    }
+    };
   };
-};
+}
 
 module Counter = ScopedModel.Make(CounterHook);
 
 module Count {
   [@react.component]
   let make = () => {
-    let count = Counter.useSelector(state => state.count, true);
+    let count: int = Counter.useSelector(state => state.count, true);
 
     Js.log("Count");
 
     <p>{ ReasonReact.string(string_of_int(count)) }</p>;
-  }
+  };
 }
 
 module Increment {
   [@react.component]
   let make = () => {
-    let increment = Counter.useSelector(state => state.increment, true);
+    let increment: unit => unit = Counter.useSelector(state => state.increment, true);
 
     Js.log("Increment");
 
     <button onClick={_ => increment()}>
       { ReasonReact.string("Increment") }
     </button>;
-  }
+  };
 }
 
 module Decrement {
   [@react.component]
   let make = () => {
-    let decrement = Counter.useSelector(state => state.decrement, true);
+    let decrement: unit => unit = Counter.useSelector(state => state.decrement, true);
 
     Js.log("Decrement");
 
     <button onClick={_ => decrement()}>
       { ReasonReact.string("Decrement") }
     </button>;
-  }
+  };
 }
 
 module IncDec {
@@ -85,7 +85,7 @@ module IncDec {
         { ReasonReact.string("Decrement") }
       </button>
     </React.Fragment>
-  }
+  };
 }
 
 module App {

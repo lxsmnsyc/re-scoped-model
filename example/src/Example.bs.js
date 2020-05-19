@@ -15,12 +15,12 @@ function call(initial) {
           return Curry._1(setCount, (function (c) {
                         return c + 1 | 0;
                       }));
-        }), []);
+        }), ([]));
   var decrement = React.useCallback((function (param) {
           return Curry._1(setCount, (function (c) {
                         return c - 1 | 0;
                       }));
-        }), []);
+        }), ([]));
   return {
           increment: increment,
           decrement: decrement,

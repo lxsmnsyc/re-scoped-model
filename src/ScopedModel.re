@@ -65,7 +65,7 @@ module Make = (M: Hook) => {
   module EmitterProvider {
     [@react.component]
     let make = (~children) => {
-      let emitter = Utils.useConstant(() => Some(Emitter.make()));
+      let emitter: option(Emitter.t(M.t)) = Utils.useConstant(() => Some(Emitter.make()));
 
       <ContextProvider value=emitter>
         children
@@ -75,7 +75,7 @@ module Make = (M: Hook) => {
 
   module ProvidedEmitter {
     let use = (): Emitter.t(M.t) => {
-      let emitter = React.useContext(context);
+      let emitter: option(Emitter.t(M.t))  = React.useContext(context);
 
       switch (emitter) {
         | Some(actualEmitter) => actualEmitter;
@@ -84,7 +84,7 @@ module Make = (M: Hook) => {
     };
 
     let useValue = (emitter: Emitter.t(M.t)): M.t => {
-      let value = emitter.getState();
+      let value: option(M.t) = emitter.getState();
 
       switch (value) {
         | Some(actualValue) => actualValue;
@@ -99,9 +99,9 @@ module Make = (M: Hook) => {
   module EmitterConsumer {
     [@react.component]
     let make = (~value, ~children) => {
-      let ctx = ProvidedEmitter.use();
+      let ctx: Emitter.t(M.t) = ProvidedEmitter.use();
 
-      let model = M.call(value);
+      let model: M.t = M.call(value);
 
       ctx.sync(model);
 
@@ -130,16 +130,16 @@ module Make = (M: Hook) => {
   }
 
   let useSelector = (selector: M.t => 'a, listen: bool): 'a => {
-    let ctx = ProvidedEmitter.use();
+    let ctx: Emitter.t(M.t) = ProvidedEmitter.use();
 
-    let internalValue = ProvidedEmitter.useValue(ctx);
+    let internalValue: M.t = ProvidedEmitter.useValue(ctx);
 
-    let (state, setState) = React.useState(() => selector(internalValue));
+    let (state, setState): ('a, ('a => 'a) => unit) = React.useState(() => selector(internalValue));
 
     React.useEffect3(() => {
       if (listen) {
-        let callback = (next: M.t) => {
-          setState(() => selector(next));
+        let callback: M.t => unit = (next: M.t) => {
+          setState(_ => selector(next));
         };
 
         ctx.on(callback);
@@ -154,16 +154,16 @@ module Make = (M: Hook) => {
   };
 
   let useSelectors = (selector: M.t => array('a), listen: bool): array('a) => {
-    let ctx = ProvidedEmitter.use();
+    let ctx: Emitter.t(M.t) = ProvidedEmitter.use();
 
-    let internalValue = ProvidedEmitter.useValue(ctx);
+    let internalValue: M.t = ProvidedEmitter.useValue(ctx);
 
-    let (state, setState) = React.useState(() => selector(internalValue));
+    let (state, setState): (array('a), (array('a) => array('a)) => unit) = React.useState(() => selector(internalValue));
 
     React.useEffect3(() => {
       if (listen) {
         let callback = (next: M.t) => {
-          let result = selector(next);
+          let result: array('a) = selector(next);
 
           let doUpdate: ref(bool) = ref(false);
 
