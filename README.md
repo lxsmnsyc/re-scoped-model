@@ -137,7 +137,7 @@ To transform the state and listen to multiple values, you can use `.useSelectors
 module IncDec {
   [@react.component]
   let make = () => {
-    let [| increment, decrement |] = Counter.useSelector(state => {
+    let [| increment, decrement |] = Counter.useSelectors(state => {
       [|
         state.increment,
         state.decrement,
