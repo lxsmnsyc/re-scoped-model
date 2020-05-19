@@ -1,16 +1,19 @@
 'use strict';
 
 var Curry = require("bs-platform/lib/js/curry.js");
+var Caml_option = require("bs-platform/lib/js/caml_option.js");
 
 var Listener = { };
 
-function make(initialState) {
+function make(param) {
   var state = {
-    contents: initialState
+    contents: undefined
   };
   var listeners = new Set();
   return {
-          state: state,
+          getState: (function (param) {
+              return state.contents;
+            }),
           on: (function (listener) {
               return listeners.add(listener);
             }),
@@ -18,11 +21,14 @@ function make(initialState) {
               return listeners.delete(listener);
             }),
           consume: (function (value) {
-              listeners.forEach((function (listener) {
-                      return Curry._1(listener, value);
-                    }));
-              state.contents = value;
-              return /* () */0;
+              state.contents = Caml_option.some(value);
+              return listeners.forEach((function (listener) {
+                            return Curry._1(listener, value);
+                          }));
+            }),
+          sync: (function (value) {
+              state.contents = Caml_option.some(value);
+              
             })
         };
 }
