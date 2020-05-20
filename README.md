@@ -81,7 +81,7 @@ module App {
 
 ### useSelector Hook
 
-To access our model's state, we can use the `useSelector` hook which accepts a function that receives the current model state, and returns a new optional value that is derived from the given state. This allows fine-grained and reasonable re-render for the listening component.
+To access our model's state, we can use the `useSelector` hook which accepts a function that receives the current model state, and returns a new value that is derived from the given state. This allows fine-grained and reasonable re-render for the listening component, as the component will only re-render if the transformed value changes every time the model updates.
 
 For example, in our `Count` component, we only `select` the `count` field of our model record.
 
@@ -128,21 +128,14 @@ module Decrement {
 }
 ```
 
-In our Counter app, only the Count component re-renders whenever any of the Model actions are called.
-
-To transform the state and listen to multiple values, you can use `.useSelectors` function, which returns the values of the transformed state in an array.
-
 ```reason
-
 module IncDec {
   [@react.component]
   let make = () => {
-    let [| increment, decrement |] = Counter.useSelectors(state => {
-      [|
-        state.increment,
-        state.decrement,
-      |];
-    }, true);
+    let (increment, decrement) = Counter.useSelector(state => (
+      state.increment,
+      state.decrement,
+    ), true);
 
     Js.log("IncDec");
 
@@ -154,7 +147,7 @@ module IncDec {
         { ReasonReact.string("Decrement") }
       </button>
     </React.Fragment>
-  }
+  };
 }
 ```
 

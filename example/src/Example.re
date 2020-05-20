@@ -68,12 +68,10 @@ module Decrement {
 module IncDec {
   [@react.component]
   let make = () => {
-    let [| increment, decrement |] = Counter.useSelectors(state => {
-      [|
-        state.increment,
-        state.decrement,
-      |];
-    }, true);
+    let (increment, decrement) = Counter.useSelector(state => (
+      state.increment,
+      state.decrement,
+    ), true);
 
     Js.log("IncDec");
 

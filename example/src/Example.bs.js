@@ -3,7 +3,6 @@
 var Curry = require("bs-platform/lib/js/curry.js");
 var React = require("react");
 var ReactDom = require("react-dom");
-var Caml_builtin_exceptions = require("bs-platform/lib/js/caml_builtin_exceptions.js");
 var ScopedModel$ReScopedModel = require("@lxsmnsyc/re-scoped-model/src/ScopedModel.bs.js");
 
 function call(initial) {
@@ -79,24 +78,14 @@ var Decrement = {
 };
 
 function Example$IncDec(Props) {
-  var match = Curry._2(Counter.useSelectors, (function (state) {
-          return [
+  var match = Curry._2(Counter.useSelector, (function (state) {
+          return /* tuple */[
                   state.increment,
                   state.decrement
                 ];
         }), true);
-  if (match.length !== 2) {
-    throw [
-          Caml_builtin_exceptions.match_failure,
-          /* tuple */[
-            "Example.re",
-            71,
-            8
-          ]
-        ];
-  }
-  var increment = match[0];
   var decrement = match[1];
+  var increment = match[0];
   console.log("IncDec");
   return React.createElement(React.Fragment, {
               children: null

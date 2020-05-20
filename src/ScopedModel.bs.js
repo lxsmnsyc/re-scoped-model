@@ -1,10 +1,8 @@
 'use strict';
 
-var $$Array = require("bs-platform/lib/js/array.js");
 var Curry = require("bs-platform/lib/js/curry.js");
 var React = require("react");
 var Caml_obj = require("bs-platform/lib/js/caml_obj.js");
-var Caml_array = require("bs-platform/lib/js/caml_array.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 var Caml_exceptions = require("bs-platform/lib/js/caml_exceptions.js");
 var Utils$ReScopedModel = require("./Utils.bs.js");
@@ -98,47 +96,9 @@ function Make(M) {
               return ;
             }
             var callback = function (next) {
-              return Curry._1(setState, (function (param) {
-                            return Curry._1(selector, next);
-                          }));
-            };
-            Curry._1(ctx.on, callback);
-            return (function (param) {
-                      return Curry._1(ctx.off, callback);
-                    });
-          }), /* tuple */[
-          ctx,
-          listen,
-          setState
-        ]);
-    return match[0];
-  };
-  var useSelectors = function (selector, listen) {
-    var ctx = use(undefined);
-    var internalValue = useValue(ctx);
-    var match = React.useState((function () {
-            return Curry._1(selector, internalValue);
-          }));
-    var setState = match[1];
-    React.useEffect((function () {
-            if (!listen) {
-              return ;
-            }
-            var callback = function (next) {
               var result = Curry._1(selector, next);
-              var doUpdate = {
-                contents: false
-              };
               return Curry._1(setState, (function (prev) {
-                            $$Array.iteri((function (k, v) {
-                                    var nv = Caml_array.caml_array_get(result, k);
-                                    if (Caml_obj.caml_notequal(nv, v)) {
-                                      doUpdate.contents = true;
-                                      return ;
-                                    }
-                                    
-                                  }), prev);
-                            if (doUpdate.contents) {
+                            if (Caml_obj.caml_notequal(prev, result)) {
                               return result;
                             } else {
                               return prev;
@@ -163,8 +123,7 @@ function Make(M) {
           ProvidedEmitter: ProvidedEmitter,
           EmitterConsumer: EmitterConsumer,
           Provider: Provider,
-          useSelector: useSelector,
-          useSelectors: useSelectors
+          useSelector: useSelector
         };
 }
 

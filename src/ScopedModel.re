@@ -139,44 +139,9 @@ module Make = (M: Hook) => {
     React.useEffect3(() => {
       if (listen) {
         let callback: M.t => unit = (next: M.t) => {
-          setState(_ => selector(next));
-        };
-
-        ctx.on(callback);
-
-        Some(() => ctx.off(callback));
-      } else {
-        None;
-      }
-    }, (ctx, listen, setState));
-
-    state;
-  };
-
-  let useSelectors = (selector: M.t => array('a), listen: bool): array('a) => {
-    let ctx: Emitter.t(M.t) = ProvidedEmitter.use();
-
-    let internalValue: M.t = ProvidedEmitter.useValue(ctx);
-
-    let (state, setState): (array('a), (array('a) => array('a)) => unit) = React.useState(() => selector(internalValue));
-
-    React.useEffect3(() => {
-      if (listen) {
-        let callback = (next: M.t) => {
-          let result: array('a) = selector(next);
-
-          let doUpdate: ref(bool) = ref(false);
-
-          setState((prev) => {
-            prev |> Array.iteri((k, v) => {
-              let nv = Array.get(result, k);
-  
-              if (nv != v) {
-                doUpdate := true;
-              }
-            });
-
-            if (doUpdate^) {
+          let result = selector(next);
+          setState(prev => {
+            if (prev != result) {
               result;
             } else {
               prev;

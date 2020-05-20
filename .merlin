@@ -1,12 +1,12 @@
 ####{BSB GENERATED: NO EDIT
 B lib/bs
 FLG -open ReScopedModel
-FLG -ppx '/Users/Alexis/Documents/GitHub/re-scoped-model/example/node_modules/bs-platform/darwin/bsc.exe -as-ppx -bs-jsx 3'
-S /Users/Alexis/Documents/GitHub/re-scoped-model/example/node_modules/bs-platform/lib/ocaml
-B /Users/Alexis/Documents/GitHub/re-scoped-model/example/node_modules/bs-platform/lib/ocaml
+FLG -ppx '/Users/Alexis/Documents/GitHub/re-scoped-model/node_modules/bs-platform/darwin/bsc.exe -as-ppx -bs-jsx 3'
+S /Users/Alexis/Documents/GitHub/re-scoped-model/node_modules/bs-platform/lib/ocaml
+B /Users/Alexis/Documents/GitHub/re-scoped-model/node_modules/bs-platform/lib/ocaml
 FLG -w +a-4-9-20-40-41-42-50-61-102
-S /Users/Alexis/Documents/GitHub/re-scoped-model/example/node_modules/reason-react/lib/ocaml
-B /Users/Alexis/Documents/GitHub/re-scoped-model/example/node_modules/reason-react/lib/ocaml
+S /Users/Alexis/Documents/GitHub/re-scoped-model/node_modules/reason-react/lib/ocaml
+B /Users/Alexis/Documents/GitHub/re-scoped-model/node_modules/reason-react/lib/ocaml
 S src
 B lib/bs/src
 ####BSB GENERATED: NO EDIT}
